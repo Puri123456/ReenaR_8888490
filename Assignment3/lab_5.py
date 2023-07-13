@@ -1,63 +1,37 @@
-# Importing required libraries
-
-# pip install selenium
-
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-# Setting up the webdriver
+# Initialize the WebDriver
 driver = webdriver.Chrome()
 
-# Navigating to the Amazon.ca homepage
-driver.get("https://www.amazon.ca")
-time.sleep(3)
+# Open Amazon website
+driver.get('https://www.amazon.com/')
 
-# Finding the search bar and entering text
-# search_bar = driver.find_element_by_id("id","twotabsearchtextbox") old syntax
-search_bar = driver.find_element("id","twotabsearchtextbox")
-search_bar.send_keys("laptop")
+# Search for the shoe using a specific keyword
+search_box = driver.find_element(By.ID, 'twotabsearchtextbox')
 
-# Submitting the search query
-search_bar.send_keys(Keys.RETURN)
+search_box.send_keys('shoes')
+search_button = driver.find_element(By.ID, 'nav-search-submit-button')
+search_button.click()
 
-# Waiting for the search results page to load
-time.sleep(5)
+# Wait for the search results to load
+search_results = WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, 'div[data-component-type="s-search-result"]')))
 
-# Verifying that the search results page has loaded
-assert "laptop" in driver.title
+# Click on the first shoe in the search results
+first_shoe = search_results[0]
+first_shoe.click()
 
-# Selecting a laptop from the search results
-laptop_link = driver.find_element("xpath","/html/body/div[1]/div[2]/div[1]/div[1]/div/span[1]/div[1]/div[3]/div/div/div/div/div/div/div[1]/span/a/div/img")
-# laptop_link = driver.find_element("By.CSS_SELECTOR","span[data-component-type='s-product-image'] a")
-laptop_link.click()
+buy_now_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'buy-now-button')))
+buy_now_button.click()
 
+# Proceed to checkout
+proceed_to_checkout_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, 'hlb-ptc-btn-native')))
+proceed_to_checkout_button.click()
 
+# Fill in the sign-in details and complete the purchase process
+# You will need to inspect the page elements and provide appropriate locators to interact with the sign-in and checkout forms
 
-# Waiting for the laptop details page to load
-time.sleep(5)
-
-# Adding the laptop to the cart
-add_to_cart_button = driver.find_element("id","add-to-cart-button")
-add_to_cart_button.click()
-
-# Waiting for the cart to update
-time.sleep(5)
-
-# Clicking on no thanks button
-no_thanks_button= driver.find_element("xpath","/html/body/div[9]/div[3]/div[1]/div/div/div[2]/div[2]/div/div/div[3]/div/span[2]/span/input")
-no_thanks_button.click()
-time.sleep(2)
-
-proceed_to_checkout= driver.find_element("xpath","/html/body/div[1]/div[2]/div/div[1]/div[2]/div/div[3]/div/div[1]/form/span/span/span/input")
-proceed_to_checkout.click()
-time.sleep(2)
-
-
-# Verifying that the laptop has been added to the cart
-# cart_count = driver.find_element("id","nav-cart-count")
-# assert cart_count.text == "1"
-# cart_count.click()
-
-# Closing the webdriver
-driver.close()
+# Close the WebDriver
+driver.quit()
